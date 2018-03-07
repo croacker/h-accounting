@@ -14,15 +14,15 @@ import (
 
 func printer(c chan string) {
 	for {
-		msg := <-c
-		file := filepath.Base(msg)
-		fmt.Println("File event", file)
+		fullPath := <-c
+		fileName := filepath.Base(fullPath)
+		fmt.Println("File event", fileName)
+		
 	}
 }
 
 func main() {
 	fmt.Println(parseTimestamp(1520328120))
-	fmt.Println(parseTimestamp(106374515))
 	var c = make(chan string)
 	go printer(c)
 	defer filewatcher.Watch("c:/tmp/check", c).Close()
