@@ -38,8 +38,6 @@ func Watch(folder string, c chan string) *CloseableWrapper {
 			case ev := <-watcher.Event:
 				if ev.IsCreate() {
 					c <- ev.Name
-				} else if ev.IsDelete() {
-					c <- "Delete: " + ev.Name
 				}
 			case err := <-watcher.Error:
 				handleError(err)
@@ -47,7 +45,7 @@ func Watch(folder string, c chan string) *CloseableWrapper {
 		}
 	}()
 
-	err = watcher.Watch("/home/alex/tmp")
+	err = watcher.Watch(folder)
 	handleError(err)
 
 	closeableWrapper := CloseableWrapper{watcher: watcher}
