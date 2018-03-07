@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"regexp"
 	"time"
 
 	"./filewatcher"
@@ -13,11 +14,24 @@ import (
 )
 
 func printer(c chan string) {
+	regex, _ := regexp.Compile("^([0-9]{2})_([0-9]{2})_([0-9]{4})_([0-9]{2})_([0-9]{2})_([0-9]{2}).*\\.json$")
 	for {
 		fullPath := <-c
 		fileName := filepath.Base(fullPath)
 		fmt.Println("File event", fileName)
-		
+		if regex.MatchString(fileName) {
+			groups := regex.FindStringSubmatch(fileName)
+			day := groups[1]
+			month := groups[2]
+			year := groups[3]
+			hour := groups[4]
+			minute := groups[5]
+			second := groups[6]
+			fmt.Println("Send day:", day, "month:",
+				month, "year:", year, "hour:", hour,
+				"minute", minute, "second", second)
+		}
+		// regex.
 	}
 }
 
