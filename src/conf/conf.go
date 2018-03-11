@@ -15,6 +15,10 @@ const fileName = "conf.json"
 //Конфигурация приложения
 type Configuration struct {
 	IncomingCheckFolder string
+	DbServer               string
+	DbName              string
+	DbUser              string
+	DbPassword          string
 }
 
 var configuration *Configuration

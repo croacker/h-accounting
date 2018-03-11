@@ -9,6 +9,8 @@ import (
 	"./conf"
 	"./filewatcher"
 	"./ofd"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 //Загруженные чеки
@@ -61,6 +63,38 @@ func storeCheck(check *ofd.OfdCheck) {
 	if checks[idx] == nil {
 		checks[idx] = check
 	}
+	storeToMongo(check)
+}
+
+//Тестовый вариант записи в БД
+func storeToMongo(check *ofd.OfdCheck) {
+	config := conf.Get()
+	dialInfo := mgo.DialInfo{
+		Addrs:    []string{config.DbServer},
+		Database: config.DbName,
+		Username: config.DbUser,
+		Password: config.DbPassword,
+	}
+	session, err := mgo.DialWithInfo(&dialInfo)
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("accounting").C("testCheck")
+	err = c.Insert(check)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	result := ofd.OfdCheck{}
+	err = c.Find(bson.M{"user": "ООО \"О'КЕЙ\""}).One(&result)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Items from DB:", result.Items)
 }
 
 //Обработать ошибку
