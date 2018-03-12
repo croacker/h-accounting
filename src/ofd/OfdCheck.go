@@ -2,7 +2,6 @@ package ofd
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 )
@@ -53,29 +52,19 @@ type OfdCheck struct {
 	UserInn            string      `json:"userInn"`
 }
 
-/**
-*Прочитать данные из чека файла и преобразовать в объект
- */
-func ReadCheck(fileName string) *OfdCheck {
-	dat, errIo := ioutil.ReadFile(fileName)
-	handleError(errIo)
+//Прочитать данные из чека файла и преобразовать в объект
+func ReadCheck(fileName string) (*OfdCheck, error) {
+	dat, err := ioutil.ReadFile(fileName)
+	handleError(err)
 
-	var ofdCheck OfdCheck
-	err := json.Unmarshal(dat, &ofdCheck)
-	if err != nil {
-		fmt.Println("Error parsing JSON: ", err)
-	}
+	var ofdCheck *OfdCheck
+	err = json.Unmarshal(dat, &ofdCheck)
+	handleError(err)
 
-	fmt.Println("Date time:", ofdCheck.DateTime)
-	for idx, item := range ofdCheck.Items {
-		fmt.Println("Item", idx, ":", item)
-	}
-	return &ofdCheck
+	return ofdCheck, err
 }
 
-/**
-*Обработать ошибку
- */
+//Обработать ошибку
 func handleError(err error) {
 	if err != nil {
 		log.Fatal(err)
