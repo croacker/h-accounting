@@ -48,7 +48,7 @@ func doWait() {
 
 //Тестовый вариант записи в БД
 func storeToMongo(check *ofd.OfdCheck) {
-	persist.PersistCheck(check)
+	persist.Check(check)
 }
 
 //Обработать ошибку

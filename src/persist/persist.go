@@ -10,8 +10,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-//Сохранить чек в хранилище
-func PersistCheck(check *ofd.OfdCheck) error {
+// Сохранить чек в хранилище
+func Check(check *ofd.OfdCheck) error {
 	var err error
 	session, err := getSession()
 	handleError(err)
@@ -25,7 +25,7 @@ func PersistCheck(check *ofd.OfdCheck) error {
 		err = persistShop(shop, session)
 		handleError(err)
 
-		findedShop, err := findShopById(shop.Id, session)
+		findedShop, err := findShopByID(shop.Id, session)
 		handleError(err)
 		if err == nil {
 			fmt.Println("findedShop", findedShop)
@@ -47,8 +47,8 @@ func persistShop(shop *ofd.Shop, session *mgo.Session) error {
 	return collection.Insert(shop)
 }
 
-//Найти в БД информацию о продавце(магазине) по id
-func findShopById(id bson.ObjectId, session *mgo.Session) (*ofd.Shop, error) {
+// Найти в БД информацию о продавце(магазине) по id
+func findShopByID(id bson.ObjectId, session *mgo.Session) (*ofd.Shop, error) {
 	shop := ofd.Shop{}
 	collection := session.DB(conf.Get().DbName).C("shop")
 	err := collection.FindId(id).One(&shop)
