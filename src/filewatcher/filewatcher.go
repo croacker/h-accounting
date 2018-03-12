@@ -27,7 +27,7 @@ func (wrapper *CloseableWrapper) Close() {
 /**
 *Наблюдать за каталогом
  */
-func Watch(folder string, c chan string) *CloseableWrapper {
+func Watch(folder string, fsChanel chan string) *CloseableWrapper {
 	watcher, err := fsnotify.NewWatcher()
 	handleError(err)
 
@@ -37,7 +37,7 @@ func Watch(folder string, c chan string) *CloseableWrapper {
 			select {
 			case ev := <-watcher.Event:
 				if ev.IsCreate() {
-					c <- ev.Name
+					fsChanel <- ev.Name
 				}
 			case err := <-watcher.Error:
 				handleError(err)
