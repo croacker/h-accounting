@@ -2,10 +2,95 @@ package ofd
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"path/filepath"
+	"regexp"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
+const fileNameRegexp = "^([0-9]{2})_([0-9]{2})_([0-9]{4})_([0-9]{2})_([0-9]{2})_([0-9]{2}).*\\.json$"
+
+//Прочитать данные из чека файла и преобразовать в объект
+func ReadCheck(fileName string) (*OfdCheck, error) {
+	var ofdCheck *OfdCheck
+	var err error
+	if isCheckFileName(fileName) {
+		dat, err := ioutil.ReadFile(fileName)
+		handleError(err)
+		err = json.Unmarshal(dat, &ofdCheck)
+		handleError(err)
+	} else {
+		err = errors.New("File" + fileName + "is not OFD check")
+	}
+	return ofdCheck, err
+}
+
+//Проверить наименование файла.
+func isCheckFileName(fullPath string) bool {
+	regex, _ := regexp.Compile(fileNameRegexp)
+	fileName := filepath.Base(fullPath)
+	return regex.MatchString(fileName)
+}
+
+//Разделить имя файла на составляющие.
+func printFileNameDetails(fullPath string) {
+	regex, _ := regexp.Compile(fileNameRegexp)
+	fileName := filepath.Base(fullPath)
+	if regex.MatchString(fileName) {
+		groups := regex.FindStringSubmatch(fileName)
+		day := groups[1]
+		month := groups[2]
+		year := groups[3]
+		hour := groups[4]
+		minute := groups[5]
+		second := groups[6]
+		fmt.Println("Send day:", day, "month:",
+			month, "year:", year, "hour:", hour,
+			"minute", minute, "second", second)
+	}
+}
+
+//Обработать ошибку.
+func handleError(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+//Преобразовать в информацию о продавце(магазине)
+func ToShop(check *OfdCheck) *Shop {
+	return &Shop{User: check.User, UserInn: check.UserInn}
+}
+
+//Получить заголовок чека.
+func ToCheckHeader(check *OfdCheck) {
+
+}
+
+//Тип продавец(магазин), названия полей сохранены как в оригинальном json
+type Shop struct {
+	Id bson.ObjectId `bson:"_id"`
+	//Наименование
+	User string
+	//ИНН
+	UserInn string
+}
+
+//Тип товар, названия полей сохранены как в оригинальном json
+type Goods struct {
+	Name  string
+	Price int
+}
+
+//Заголовок чека
+type CheckHeader struct {
+}
+
+//ОФД чек, оригинал из файла
 type OfdCheck struct {
 	CashTotalSum         int         `json:"cashTotalSum"`
 	DateTime             int         `json:"dateTime"`
@@ -50,23 +135,4 @@ type OfdCheck struct {
 	TotalSum           int         `json:"totalSum"`
 	User               string      `json:"user"`
 	UserInn            string      `json:"userInn"`
-}
-
-//Прочитать данные из чека файла и преобразовать в объект
-func ReadCheck(fileName string) (*OfdCheck, error) {
-	dat, err := ioutil.ReadFile(fileName)
-	handleError(err)
-
-	var ofdCheck *OfdCheck
-	err = json.Unmarshal(dat, &ofdCheck)
-	handleError(err)
-
-	return ofdCheck, err
-}
-
-//Обработать ошибку
-func handleError(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
 }

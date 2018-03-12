@@ -9,15 +9,10 @@ import (
 	"./conf"
 	"./filewatcher"
 	"./ofd"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"./persist"
 )
 
-//Загруженные чеки
-var checks map[string]*ofd.OfdCheck
-
 func printer(c chan string) {
-	regex, _ := regexp.Compile("^([0-9]{2})_([0-9]{2})_([0-9]{4})_([0-9]{2})_([0-9]{2})_([0-9]{2}).*\\.json$")
 	for {
 		fullPath := <-c
 		fileName := filepath.Base(fullPath)
@@ -28,7 +23,7 @@ func printer(c chan string) {
 			for idx, item := range ofdCheck.Items {
 				fmt.Println("Item", idx, ":", item)
 			}
-			storeCheck(ofdCheck)
+			storeToMongo(ofdCheck)
 		} else {
 			handleError(err)
 		}
@@ -39,11 +34,9 @@ func main() {
 	appConf := conf.Get()
 	fmt.Println("IncomingCheckFolder", appConf.IncomingCheckFolder)
 
-	initPersistStore()
-
 	var c = make(chan string)
 	go printer(c)
-	defer filewatcher.Watch("/home/alex/tmp/check", c).Close()
+	defer filewatcher.Watch(appConf.IncomingCheckFolder, c).Close()
 	doWait()
 }
 
@@ -53,49 +46,9 @@ func doWait() {
 	<-done
 }
 
-//Инициализировать хранилище
-func initPersistStore() {
-	checks = make(map[string]*ofd.OfdCheck)
-}
-
-//Сохранить чек
-func storeCheck(check *ofd.OfdCheck) {
-	idx := string(check.DateTime)
-	if checks[idx] == nil {
-		checks[idx] = check
-	}
-	storeToMongo(check)
-}
-
 //Тестовый вариант записи в БД
 func storeToMongo(check *ofd.OfdCheck) {
-	config := conf.Get()
-	dialInfo := mgo.DialInfo{
-		Addrs:    []string{config.DbServer},
-		Database: config.DbName,
-		Username: config.DbUser,
-		Password: config.DbPassword,
-	}
-	session, err := mgo.DialWithInfo(&dialInfo)
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("accounting").C("testCheck")
-	err = c.Insert(check)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	result := ofd.OfdCheck{}
-	err = c.Find(bson.M{"user": "ООО \"О'КЕЙ\""}).One(&result)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Items from DB:", result.Items)
+	persist.PersistCheck(check)
 }
 
 //Обработать ошибку
