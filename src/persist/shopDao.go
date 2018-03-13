@@ -1,5 +1,5 @@
 package persist
 
 // DAO сущности магазни
-type ShopkDao struct {
+type ShopDao struct {
 }
