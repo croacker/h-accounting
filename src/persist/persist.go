@@ -10,18 +10,19 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// Сохранить чек в хранилище
-func Check(check *ofd.OfdCheck) error {
+// Save - Сохранить чек в хранилище
+func Save(check *ofd.OfdCheck) error {
 	var err error
 	session, err := getSession()
 	handleError(err)
 	if err == nil {
 		defer session.Close()
 		//Сохранить оригинальный чек
-		err = persistOriginalCheck(check, session)
-		handleError(err)
+		dao := OfdCheckDao{}
+		dao.Save(check, session)
 
-		shop := ofd.ToShop(check)
+		shop := NewShop(check)
+		dao = ShopDao{}
 		err = persistShop(shop, session)
 		handleError(err)
 
@@ -32,12 +33,6 @@ func Check(check *ofd.OfdCheck) error {
 		}
 	}
 	return err
-}
-
-//Сохранить в БД оригинальный чек
-func persistOriginalCheck(check *ofd.OfdCheck, session *mgo.Session) error {
-	collection := session.DB(conf.Get().DbName).C("originalCheck")
-	return collection.Insert(check)
 }
 
 //Сохранить в БД информацию о продавце(магазине)
@@ -60,6 +55,17 @@ func getSession() (*mgo.Session, error) {
 	dialInfo := getDialInfo()
 	session, err := mgo.DialWithInfo(dialInfo)
 	return session, err
+}
+
+//Получить БД
+func getDatabase(session *mgo.Session) *mgo.Database {
+	return session.DB(conf.Get().DbName)
+}
+
+//Получить коллекцию
+func getCollection(name string, session *mgo.Session) *mgo.Collection {
+	db := getDatabase(session)
+	return db.C(name)
 }
 
 //Получить данные для доступа к хранилищу
