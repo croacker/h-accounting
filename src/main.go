@@ -20,9 +20,9 @@ func printer(c chan string) {
 		ofdCheck, err := ofd.ReadCheck(fullPath)
 		if err == nil {
 			fmt.Println("Date time:", commonutils.ParseTimestamp(int64(ofdCheck.DateTime)))
-			for idx, item := range ofdCheck.Items {
-				fmt.Println("Item", idx, ":", item)
-			}
+			// for idx, item := range ofdCheck.Items {
+			// 	fmt.Println("Item", idx, ":", item)
+			// }
 			storeToMongo(ofdCheck)
 		} else {
 			handleError(err)

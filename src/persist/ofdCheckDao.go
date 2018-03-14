@@ -1,6 +1,8 @@
 package persist
 
 import (
+	"fmt"
+
 	"../ofd"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -12,29 +14,34 @@ type OfdCheckDao struct {
 
 // Сохранить в БД
 func (dao OfdCheckDao) Save(check *ofd.OfdCheck, session *mgo.Session) error {
-	collection := getCollection("originalCheck", session)
-	collection.Insert(check)
+	_, err := dao.Find(check, session)
+	if err != nil {
+		fmt.Println("Save new OFD check")
+		collection := collection("originalCheck", session)
+		collection.Insert(check)
+	}
 	return nil
 }
 
 //Найти в БД
-func (dao OfdCheckDao) Find(check *ofd.OfdCheck, session *mgo.Session) *ofd.OfdCheck {
-	collection := getCollection("originalCheck", session)
+func (dao OfdCheckDao) Find(check *ofd.OfdCheck, session *mgo.Session) (*ofd.OfdCheck, error) {
+	collection := collection("originalCheck", session)
 	result := ofd.OfdCheck{}
-	collection.Find(bson.M{"datetime": check.DateTime, "userinn": check.UserInn}).One(&result)
-	return &result
+	err := collection.Find(bson.M{"datetime": check.DateTime, "userinn": check.UserInn}).One(&result)
+	return &result, err
 }
 
 //Удалить из БД
 func (dao OfdCheckDao) Delete(check *ofd.OfdCheck, session *mgo.Session) error {
-	collection := getCollection("originalCheck", session)
+	collection := collection("originalCheck", session)
 	collection.Remove(bson.M{"datetime": check.DateTime, "userinn": check.UserInn})
 	return nil
 }
 
 //Получить
-func (dao OfdCheckDao) GetAll(session *mgo.Session) error {
-	collection := getCollection("originalCheck", session)
+func (dao OfdCheckDao) GetAll(session *mgo.Session) ([]ofd.OfdCheck, error) {
+	collection := collection("originalCheck", session)
 	var results []ofd.OfdCheck
-	return collection.Find(nil).All(results)
+	err := collection.Find(nil).All(results)
+	return results, err
 }

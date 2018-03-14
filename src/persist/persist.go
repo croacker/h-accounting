@@ -1,13 +1,11 @@
 package persist
 
 import (
-	"fmt"
 	"log"
 
 	"../conf"
 	"../ofd"
 	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // Save - Сохранить чек в хранилище
@@ -18,36 +16,24 @@ func Save(check *ofd.OfdCheck) error {
 	if err == nil {
 		defer session.Close()
 		//Сохранить оригинальный чек
-		dao := OfdCheckDao{}
-		dao.Save(check, session)
+		ofdCheckDao := OfdCheckDao{}
+		ofdCheckDao.Save(check, session)
 
 		shop := NewShop(check)
-		dao = ShopDao{}
-		err = persistShop(shop, session)
-		handleError(err)
+		shopDao := ShopDao{}
+		shopDao.Save(shop, session)
 
-		findedShop, err := findShopByID(shop.Id, session)
-		handleError(err)
-		if err == nil {
-			fmt.Println("findedShop", findedShop)
+		goodsDao := GoodsDao{}
+		var prices []Price
+		for _, item := range check.Items {
+			goods := NewGoods(item.Name)
+			goodsDao.Save(goods, session)
+
+			price := NewPrice(goods, )
+			prices
 		}
 	}
 	return err
-}
-
-//Сохранить в БД информацию о продавце(магазине)
-func persistShop(shop *ofd.Shop, session *mgo.Session) error {
-	shop.Id = bson.NewObjectId()
-	collection := session.DB(conf.Get().DbName).C("shop")
-	return collection.Insert(shop)
-}
-
-// Найти в БД информацию о продавце(магазине) по id
-func findShopByID(id bson.ObjectId, session *mgo.Session) (*ofd.Shop, error) {
-	shop := ofd.Shop{}
-	collection := session.DB(conf.Get().DbName).C("shop")
-	err := collection.FindId(id).One(&shop)
-	return &shop, err
 }
 
 //Получить сессию
@@ -63,7 +49,7 @@ func getDatabase(session *mgo.Session) *mgo.Database {
 }
 
 //Получить коллекцию
-func getCollection(name string, session *mgo.Session) *mgo.Collection {
+func collection(name string, session *mgo.Session) *mgo.Collection {
 	db := getDatabase(session)
 	return db.C(name)
 }
