@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
+	"time"
 
-	"./commonutils"
 	"./conf"
 	"./filewatcher"
 	"./ofd"
@@ -15,14 +15,11 @@ import (
 func printer(c chan string) {
 	for {
 		fullPath := <-c
+		time.Sleep(1 * time.Second)
 		fileName := filepath.Base(fullPath)
 		fmt.Println("Incoming file", fileName)
 		ofdCheck, err := ofd.ReadCheck(fullPath)
 		if err == nil {
-			fmt.Println("Date time:", commonutils.ParseTimestamp(int64(ofdCheck.DateTime)))
-			// for idx, item := range ofdCheck.Items {
-			// 	fmt.Println("Item", idx, ":", item)
-			// }
 			storeToMongo(ofdCheck)
 		} else {
 			handleError(err)
@@ -48,7 +45,9 @@ func doWait() {
 
 //Тестовый вариант записи в БД
 func storeToMongo(check *ofd.OfdCheck) {
+	fmt.Println("BEGIN save OFD check")
 	persist.Save(check)
+	fmt.Println("Save OFD check SUCCESS")
 }
 
 //Обработать ошибку

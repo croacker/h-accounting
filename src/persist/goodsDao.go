@@ -25,7 +25,7 @@ func (dao GoodsDao) Save(goods *Goods, session *mgo.Session) (*Goods, error) {
 func (dao GoodsDao) FindName(goods *Goods, session *mgo.Session) (*Goods, error) {
 	collection := collection("goods", session)
 	result := Goods{}
-	err := collection.Find(bson.M{"userinn": goods.Name}).One(&result)
+	err := collection.Find(bson.M{"name": goods.Name}).One(&result)
 	return &result, err
 }
 

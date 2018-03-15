@@ -1,6 +1,7 @@
 package persist
 
 import (
+	"fmt"
 	"log"
 
 	"../conf"
@@ -21,20 +22,24 @@ func Save(check *ofd.OfdCheck) error {
 
 		shop := NewShop(check)
 		shopDao := ShopDao{}
-		resultShop, _ := shopDao.Save(shop, session)
+		shop, _ = shopDao.Save(shop, session)
+		fmt.Println("Save Shop id:", shop.Id.String(), ", user:", shop.User, " INN:", shop.UserInn)
 
 		goodsDao := GoodsDao{}
 		priceDao := PriceDao{}
 		for _, item := range check.Items {
 			goods := NewGoods(item.Name)
 			goods, _ = goodsDao.Save(goods, session)
+			fmt.Println("Save Goods id:", goods.Id.String(), ", name:", goods.Name)
 
-			price := NewPrice(goods, resultShop, item.Price, check.DateTime)
-			priceDao.Save(price, session)
+			price := NewPrice(goods, shop, item.Price, check.DateTime)
+			price, _ = priceDao.Save(price, session)
+			fmt.Println("Save Price id:", price.Id.String(), ", Good name:", goods.Name)
 		}
-		checkTotal := NewCheckTotal(shop, check)
 		checkTotalDao := CheckTotalDao{}
-		checkTotalDao.Save(checkTotal, session)
+		checkTotal := NewCheckTotal(shop, check)
+		checkTotal, _ = checkTotalDao.Save(checkTotal, session)
+		fmt.Println("Save Check total id:", checkTotal.Id.String())
 	}
 	return err
 }

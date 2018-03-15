@@ -7,7 +7,7 @@ import (
 
 //CheckTotal Итоги чека
 type CheckTotal struct {
-	Id                   bson.ObjectId
+	Id                   bson.ObjectId `bson:"_id"`
 	ShopId               bson.ObjectId
 	DateTime             int
 	CashTotalSum         int

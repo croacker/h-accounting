@@ -1,8 +1,6 @@
 package persist
 
 import (
-	"fmt"
-
 	"../ofd"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -16,7 +14,6 @@ type OfdCheckDao struct {
 func (dao OfdCheckDao) Save(check *ofd.OfdCheck, session *mgo.Session) error {
 	_, err := dao.Find(check, session)
 	if err != nil {
-		fmt.Println("Save new OFD check")
 		collection := collection("originalCheck", session)
 		collection.Insert(check)
 	}
