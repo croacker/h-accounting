@@ -25,13 +25,16 @@ func Save(check *ofd.OfdCheck) error {
 
 		goodsDao := GoodsDao{}
 		priceDao := PriceDao{}
-		for idx, item := range check.Items {
+		for _, item := range check.Items {
 			goods := NewGoods(item.Name)
 			goods, _ = goodsDao.Save(goods, session)
 
 			price := NewPrice(goods, resultShop, item.Price, check.DateTime)
-
+			priceDao.Save(price, session)
 		}
+		checkTotal := NewCheckTotal(shop, check)
+		checkTotalDao := CheckTotalDao{}
+		checkTotalDao.Save(checkTotal, session)
 	}
 	return err
 }

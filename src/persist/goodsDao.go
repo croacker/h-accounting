@@ -18,7 +18,7 @@ func (dao GoodsDao) Save(goods *Goods, session *mgo.Session) (*Goods, error) {
 		collection.Insert(goods)
 		resultGoods = goods
 	}
-	return goods, nil
+	return resultGoods, nil
 }
 
 //Найти в БД
