@@ -13,5 +13,7 @@ type Price struct {
 	DateTime int
 }
 
-
-func NewPrice(goods Goods, shop Shop, price int, datatime int) 
+//Фабричный метод
+func NewPrice(goods *Goods, shop *Shop, checkPrice int, datatime int) *Price {
+	return &Price{bson.NewObjectId(), goods.Id, shop.Id, checkPrice, datatime}
+}

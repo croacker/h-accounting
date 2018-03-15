@@ -10,14 +10,15 @@ type ShopDao struct {
 }
 
 // Сохранить в БД
-func (dao ShopDao) Save(shop *Shop, session *mgo.Session) error {
-	_, err := dao.Find(shop, session)
+func (dao ShopDao) Save(shop *Shop, session *mgo.Session) (*Shop, error) {
+	resultShop, err := dao.Find(shop, session)
 	if err != nil {
 		shop.Id = bson.NewObjectId()
 		collection := collection("shop", session)
 		collection.Insert(shop)
+		resultShop = shop
 	}
-	return nil
+	return resultShop, nil
 }
 
 //Найти в БД

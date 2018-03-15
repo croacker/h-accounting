@@ -10,14 +10,15 @@ type GoodsDao struct {
 }
 
 // Сохранить в БД
-func (dao GoodsDao) Save(goods *Goods, session *mgo.Session) error {
-	_, err := dao.FindName(goods, session)
+func (dao GoodsDao) Save(goods *Goods, session *mgo.Session) (*Goods, error) {
+	resultGoods, err := dao.FindName(goods, session)
 	if err != nil {
 		goods.Id = bson.NewObjectId()
 		collection := collection("goods", session)
 		collection.Insert(goods)
+		resultGoods = goods
 	}
-	return nil
+	return goods, nil
 }
 
 //Найти в БД
