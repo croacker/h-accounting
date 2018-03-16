@@ -1,6 +1,6 @@
 package ofd
 
-//ОФД чек, оригинал из файла
+//OfdCheck ОФД чек, оригинал из файла
 type OfdCheck struct {
 	CashTotalSum         int         `json:"cashTotalSum"`
 	DateTime             int         `json:"dateTime"`
@@ -46,3 +46,6 @@ type OfdCheck struct {
 	User               string      `json:"user"`
 	UserInn            string      `json:"userInn"`
 }
+
+//OfdChecks ОФД чеки, оригинал из файла
+type OfdChecks []OfdCheck

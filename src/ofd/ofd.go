@@ -13,18 +13,25 @@ import (
 const fileNameRegexp = "^([0-9]{2})_([0-9]{2})_([0-9]{4})_([0-9]{2})_([0-9]{2})_([0-9]{2}).*\\.json$"
 
 //Прочитать данные из чека файла и преобразовать в объект
-func ReadCheck(fileName string) (*OfdCheck, error) {
-	var ofdCheck *OfdCheck
+func ReadChecks(fileName string) (*OfdChecks, error) {
+	var ofdChecks *OfdChecks
 	var err error
 	if isCheckFileName(fileName) {
 		dat, err := ioutil.ReadFile(fileName)
 		handleError(err)
-		err = json.Unmarshal(dat, &ofdCheck)
+		err = json.Unmarshal(dat, &ofdChecks)
 		handleError(err)
+		if err != nil {
+			var ofdCheck *OfdCheck
+			err = json.Unmarshal(dat, &ofdCheck)
+			ofdChecks = &OfdChecks{
+				*ofdCheck,
+			}
+		}
 	} else {
 		err = errors.New("File" + fileName + "is not OFD check")
 	}
-	return ofdCheck, err
+	return ofdChecks, err
 }
 
 //Проверить наименование файла.
@@ -55,7 +62,7 @@ func printFileNameDetails(fullPath string) {
 //Обработать ошибку.
 func handleError(err error) {
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
 

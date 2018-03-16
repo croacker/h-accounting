@@ -10,36 +10,38 @@ import (
 )
 
 // Save - Сохранить чек в хранилище
-func Save(check *ofd.OfdCheck) error {
+func Save(checks *ofd.OfdChecks) error {
 	var err error
 	session, err := getSession()
 	handleError(err)
 	if err == nil {
 		defer session.Close()
-		//Сохранить оригинальный чек
-		ofdCheckDao := OfdCheckDao{}
-		ofdCheckDao.Save(check, session)
+		for _, check := range *checks {
+			//Сохранить оригинальный чек
+			ofdCheckDao := OfdCheckDao{}
+			ofdCheckDao.Save(&check, session)
 
-		shop := NewShop(check)
-		shopDao := ShopDao{}
-		shop, _ = shopDao.Save(shop, session)
-		fmt.Println("Save Shop id:", shop.Id.String(), ", user:", shop.User, " INN:", shop.UserInn)
+			shop := NewShop(&check)
+			shopDao := ShopDao{}
+			shop, _ = shopDao.Save(shop, session)
+			fmt.Println("Save Shop id:", shop.Id.String(), ", user:", shop.User, " INN:", shop.UserInn)
 
-		goodsDao := GoodsDao{}
-		priceDao := PriceDao{}
-		for _, item := range check.Items {
-			goods := NewGoods(item.Name)
-			goods, _ = goodsDao.Save(goods, session)
-			fmt.Println("Save Goods id:", goods.Id.String(), ", name:", goods.Name)
+			goodsDao := GoodsDao{}
+			priceDao := PriceDao{}
+			for _, item := range check.Items {
+				goods := NewGoods(item.Name)
+				goods, _ = goodsDao.Save(goods, session)
+				fmt.Println("Save Goods id:", goods.Id.String(), ", name:", goods.Name)
 
-			price := NewPrice(goods, shop, item.Price, check.DateTime)
-			price, _ = priceDao.Save(price, session)
-			fmt.Println("Save Price id:", price.Id.String(), ", Good name:", goods.Name)
+				price := NewPrice(goods, shop, item.Price, check.DateTime)
+				price, _ = priceDao.Save(price, session)
+				fmt.Println("Save Price id:", price.Id.String(), ", Good name:", goods.Name, ", price:", price.Price)
+			}
+			checkTotalDao := CheckTotalDao{}
+			checkTotal := NewCheckTotal(shop, &check)
+			checkTotal, _ = checkTotalDao.Save(checkTotal, session)
+			fmt.Println("Save Check total id:", checkTotal.Id.String())
 		}
-		checkTotalDao := CheckTotalDao{}
-		checkTotal := NewCheckTotal(shop, check)
-		checkTotal, _ = checkTotalDao.Save(checkTotal, session)
-		fmt.Println("Save Check total id:", checkTotal.Id.String())
 	}
 	return err
 }

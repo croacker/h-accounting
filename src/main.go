@@ -18,9 +18,9 @@ func printer(c chan string) {
 		time.Sleep(1 * time.Second)
 		fileName := filepath.Base(fullPath)
 		fmt.Println("Incoming file", fileName)
-		ofdCheck, err := ofd.ReadCheck(fullPath)
+		ofdChecks, err := ofd.ReadChecks(fullPath)
 		if err == nil {
-			storeToMongo(ofdCheck)
+			storeToMongo(ofdChecks)
 		} else {
 			handleError(err)
 		}
@@ -44,10 +44,10 @@ func doWait() {
 }
 
 //Тестовый вариант записи в БД
-func storeToMongo(check *ofd.OfdCheck) {
-	fmt.Println("BEGIN save OFD check")
+func storeToMongo(check *ofd.OfdChecks) {
+	fmt.Println("BEGIN save OFD checks")
 	persist.Save(check)
-	fmt.Println("Save OFD check SUCCESS")
+	fmt.Println("Save OFD checks SUCCESS")
 }
 
 //Обработать ошибку
