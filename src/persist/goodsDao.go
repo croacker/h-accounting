@@ -44,10 +44,10 @@ func (dao GoodsDao) Delete(goods *Goods, session *mgo.Session) error {
 	return nil
 }
 
-//Получить
+//GetAll Получить
 func (dao GoodsDao) GetAll(session *mgo.Session) ([]Goods, error) {
 	collection := collection("goods", session)
 	var results []Goods
-	err := collection.Find(nil).All(results)
+	err := collection.Find(nil).All(&results)
 	return results, err
 }

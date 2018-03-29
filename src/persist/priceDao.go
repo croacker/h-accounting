@@ -50,6 +50,6 @@ func (dao PriceDao) Delete(price *Price, session *mgo.Session) error {
 func (dao PriceDao) GetAll(session *mgo.Session) ([]Price, error) {
 	collection := collection("price", session)
 	var results []Price
-	err := collection.Find(nil).All(results)
+	err := collection.Find(nil).All(&results)
 	return results, err
 }

@@ -40,6 +40,6 @@ func (dao ShopDao) Delete(shop *Shop, session *mgo.Session) error {
 func (dao ShopDao) GetAll(session *mgo.Session) ([]Shop, error) {
 	collection := collection("shop", session)
 	var results []Shop
-	err := collection.Find(nil).All(results)
+	err := collection.Find(nil).All(&results)
 	return results, err
 }

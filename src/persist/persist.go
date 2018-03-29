@@ -46,6 +46,61 @@ func Save(checks *ofd.OfdChecks) error {
 	return err
 }
 
+//OfdChecksList получить все чеки ОФД
+func OfdChecksList() []ofd.OfdCheck {
+	var result []ofd.OfdCheck
+	session, err := getSession()
+	handleError(err)
+	dao := OfdCheckDao{}
+	result, err = dao.GetAll(session)
+	handleError(err)
+	return result
+}
+
+//GoodsList Список товаров
+func GoodsList() []Goods {
+	var result []Goods
+	session, err := getSession()
+	handleError(err)
+	dao := GoodsDao{}
+	result, err = dao.GetAll(session)
+	handleError(err)
+	return result
+}
+
+//CheckTotalsList Список товаров
+func CheckTotalsList() []CheckTotal {
+	var result []CheckTotal
+	session, err := getSession()
+	handleError(err)
+	dao := CheckTotalDao{}
+	result, err = dao.GetAll(session)
+	handleError(err)
+	return result
+}
+
+//PriceList Список цен
+func PriceList() []Price {
+	var result []Price
+	session, err := getSession()
+	handleError(err)
+	dao := PriceDao{}
+	result, err = dao.GetAll(session)
+	handleError(err)
+	return result
+}
+
+//PriceList Список цен
+func ShopList() []Shop {
+	var result []Shop
+	session, err := getSession()
+	handleError(err)
+	dao := ShopDao{}
+	result, err = dao.GetAll(session)
+	handleError(err)
+	return result
+}
+
 //Получить сессию
 func getSession() (*mgo.Session, error) {
 	dialInfo := getDialInfo()

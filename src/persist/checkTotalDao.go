@@ -48,6 +48,6 @@ func (dao CheckTotalDao) Delete(checkTotal *CheckTotal, session *mgo.Session) er
 func (dao CheckTotalDao) GetAll(session *mgo.Session) ([]CheckTotal, error) {
 	collection := collection("checkTotal", session)
 	var results []CheckTotal
-	err := collection.Find(nil).All(results)
+	err := collection.Find(nil).All(&results)
 	return results, err
 }

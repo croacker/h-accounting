@@ -39,6 +39,6 @@ func (dao OfdCheckDao) Delete(check *ofd.OfdCheck, session *mgo.Session) error {
 func (dao OfdCheckDao) GetAll(session *mgo.Session) ([]ofd.OfdCheck, error) {
 	collection := collection("originalCheck", session)
 	var results []ofd.OfdCheck
-	err := collection.Find(nil).All(results)
+	err := collection.Find(nil).All(&results)
 	return results, err
 }

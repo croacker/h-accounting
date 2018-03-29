@@ -8,6 +8,7 @@ import (
 
 	"./conf"
 	"./filewatcher"
+	"./httpserver"
 	"./ofd"
 	"./persist"
 )
@@ -33,6 +34,7 @@ func main() {
 
 	var c = make(chan string)
 	go printer(c)
+	go httpserver.Start()
 	defer filewatcher.Watch(appConf.IncomingCheckFolder, c).Close()
 	doWait()
 }
@@ -53,6 +55,6 @@ func storeToMongo(check *ofd.OfdChecks) {
 //Обработать ошибку
 func handleError(err error) {
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
