@@ -1,17 +1,18 @@
 package httpserver
 
 import (
-	"encoding/json"
-	"fmt"
+	"html/template"
 	"net/http"
 
 	"../persist"
 )
 
 func goodsList(writer http.ResponseWriter, request *http.Request) {
-	conf := getCheckTotals()
-	str, _ := json.Marshal(conf)
-	fmt.Fprintf(writer, string(str))
+	tmpl := template.Must(template.ParseFiles("./static/goods.html"))
+	goods := getGoods()
+	tmpl.Execute(writer, goods)
+	// str, _ := json.Marshal(goods)
+	// fmt.Fprintf(writer, string(str))
 }
 
 func getGoods() []persist.Goods {

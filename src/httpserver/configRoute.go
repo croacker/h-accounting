@@ -1,8 +1,7 @@
 package httpserver
 
 import (
-	"encoding/json"
-	"fmt"
+	"html/template"
 	"net/http"
 
 	"../conf"
@@ -10,9 +9,11 @@ import (
 
 //Слушатель http запроса
 func confList(writer http.ResponseWriter, request *http.Request) {
+	tmpl := template.Must(template.ParseFiles("./static/config.html"))
 	conf := getConfig()
-	str, _ := json.Marshal(conf)
-	fmt.Fprintf(writer, string(str))
+	tmpl.Execute(writer, conf)
+	// str, _ := json.Marshal(conf)
+	// fmt.Fprintf(writer, string(str))
 }
 
 func getConfig() *conf.Configuration {

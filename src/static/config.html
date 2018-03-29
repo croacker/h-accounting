@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Данные о закупках</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">  <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+</head>
+<body>
+                    <ul class="collection with-header">
+                            <li class="collection-header"><h4>Конфигурация</h4></li>
+                            <li class="collection-item">Входящий каталог: {{.IncomingCheckFolder}}</li>
+                            <li class="collection-item">Сервер: {{.DbServer}}</li>
+                            <li class="collection-item">БД: {{.DbName}}</li>
+                            <li class="collection-item">Пользователь: {{.DbUser}}</li>
+                            <li class="collection-item">Пароль: {{.DbPassword}}</li>
+                          </ul>
+</body>
+</html>
