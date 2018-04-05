@@ -11,16 +11,19 @@ import (
 
 func StartGin() {
 	router := gin.Default()
+	router.Static("/static", "./static")
 	router.LoadHTMLGlob("./static/templates/*")
-	router.GET("/", func(c *gin.Context) {
-		c.HTML(
-			http.StatusOK,
-			"index.html",
-			gin.H{
-				"title": "Home Page",
-			},
-		)
-	})
+	router.GET("/", indexEndpoint)
+	// 	func(context *gin.Context) {
+	// 	context.HTML(
+	// 		http.StatusOK,
+	// 		"index.html",
+	// 		gin.H{
+	// 			"title": "Финансы",
+	// 		},
+	// 	)
+	// }
+
 	router.Run()
 }
 
