@@ -34,7 +34,7 @@ func main() {
 
 	var c = make(chan string)
 	go printer(c)
-	go httpserver.Start()
+	go httpserver.StartGin()
 	defer filewatcher.Watch(appConf.IncomingCheckFolder, c).Close()
 	doWait()
 }
