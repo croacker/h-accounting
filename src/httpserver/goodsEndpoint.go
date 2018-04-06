@@ -3,10 +3,10 @@ package httpserver
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"net/http"
 
 	"../persist"
+	"github.com/gin-gonic/gin"
 )
 
 func goods(writer http.ResponseWriter, request *http.Request) {
@@ -15,10 +15,14 @@ func goods(writer http.ResponseWriter, request *http.Request) {
 	fmt.Fprintf(writer, string(str))
 }
 
-func goodsList(writer http.ResponseWriter, request *http.Request) {
-	tmpl := template.Must(template.ParseFiles("./static/goods.html"))
-	goods := getGoods()
-	tmpl.Execute(writer, goods)
+func goodsList(context *gin.Context) {
+	context.HTML(
+		http.StatusOK,
+		"goods.html",
+		gin.H{
+			"goods": getGoods(),
+		},
+	)
 }
 
 func getGoods() []persist.Goods {
