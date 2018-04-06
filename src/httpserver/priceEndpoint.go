@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"../commonutils"
-	"../persist"
+	"../persistmongo"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,8 +26,8 @@ func priceList(context *gin.Context) {
 	)
 }
 
-func getPrices() []persist.Price {
-	return persist.PriceList()
+func getPrices() []persistmongo.Price {
+	return persistmongo.PriceList()
 }
 
 func getPricesDto() []PriceDto {

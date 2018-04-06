@@ -10,7 +10,8 @@ import (
 	"./filewatcher"
 	"./httpserver"
 	"./ofd"
-	"./persist"
+	"./persistmongo"
+	"./persistsql"
 )
 
 func printer(c chan string) {
@@ -29,6 +30,7 @@ func printer(c chan string) {
 }
 
 func main() {
+	persistsql.Connect()
 	appConf := conf.Get()
 	fmt.Println("IncomingCheckFolder", appConf.IncomingCheckFolder)
 
@@ -48,7 +50,7 @@ func doWait() {
 //Тестовый вариант записи в БД
 func storeToMongo(check *ofd.OfdChecks) {
 	fmt.Println("BEGIN save OFD checks")
-	persist.Save(check)
+	persistmongo.Save(check)
 	fmt.Println("Save OFD checks SUCCESS")
 }
 

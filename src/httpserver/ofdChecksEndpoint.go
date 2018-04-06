@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"../ofd"
-	"../persist"
+	"../persistmongo"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,5 +19,5 @@ func ofdCheckList(context *gin.Context) {
 }
 
 func getOfdChecks() []ofd.OfdCheck {
-	return persist.OfdChecksList()
+	return persistmongo.OfdChecksList()
 }

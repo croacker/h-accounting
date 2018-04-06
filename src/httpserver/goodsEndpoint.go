@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"../persist"
+	"../persistmongo"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,6 +25,6 @@ func goodsList(context *gin.Context) {
 	)
 }
 
-func getGoods() []persist.Goods {
-	return persist.GoodsList()
+func getGoods() []persistmongo.Goods {
+	return persistmongo.GoodsList()
 }

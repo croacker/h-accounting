@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"../commonutils"
-	"../persist"
+	"../persistmongo"
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,7 +38,7 @@ func getCheckTotals() ([]CheckTotalDto, TotalDto) {
 	totals := make([]CheckTotalDto, 0)
 	cashTotal := 0
 	ecashTotal := 0
-	for _, checkTotal := range persist.CheckTotalsList() {
+	for _, checkTotal := range persistmongo.CheckTotalsList() {
 		dto := CheckTotalDto{
 			Id:            checkTotal.Id.String(),
 			ShopId:        checkTotal.ShopId.String(),

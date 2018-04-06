@@ -1,4 +1,4 @@
-package persist
+package persistmongo
 
 import (
 	"gopkg.in/mgo.v2/bson"

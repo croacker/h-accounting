@@ -3,7 +3,7 @@ package httpserver
 import (
 	"net/http"
 
-	"../persist"
+	"../persistmongo"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,6 +17,6 @@ func shopList(context *gin.Context) {
 	)
 }
 
-func getShops() []persist.Shop {
-	return persist.ShopList()
+func getShops() []persistmongo.Shop {
+	return persistmongo.ShopList()
 }
