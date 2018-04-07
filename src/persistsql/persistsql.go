@@ -10,6 +10,7 @@ import (
 
 func Connect() {
 	db := GetDb()
+	migrate(db)
 	defer db.Close()
 
 	// Migrate the schema
@@ -45,4 +46,6 @@ func GetDb() *gorm.DB {
 func migrate(db *gorm.DB) {
 	db.AutoMigrate(&ProductCathegory{})
 	db.AutoMigrate(&Product{})
+	db.AutoMigrate(&Shop{})
+	db.AutoMigrate(&Price{})
 }

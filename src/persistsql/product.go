@@ -15,13 +15,21 @@ type ProductDao struct {
 	db gorm.DB
 }
 
-func (dao ProductDao) findById(id uint) *Product {
+func (dao ProductDao) Create(product *Product) {
+	dao.db.Create(product)
+}
+
+func (dao ProductDao) Save(product *Product) {
+	dao.db.Save(product)
+}
+
+func (dao ProductDao) FindById(id uint) *Product {
 	var product Product
 	dao.db.First(&product, id)
 	return &product
 }
 
-func (dao ProductDao) findByName(name string) *Product {
+func (dao ProductDao) FindByName(name string) *Product {
 	var product Product
 	dao.db.First(&product, "name = ?", name)
 	return &product
