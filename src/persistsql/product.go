@@ -1,6 +1,8 @@
 package persistsql
 
 import (
+	"fmt"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -12,11 +14,23 @@ type Product struct {
 }
 
 type ProductDao struct {
-	db gorm.DB
+	db *gorm.DB
 }
 
 func (dao ProductDao) Create(product *Product) {
 	dao.db.Create(product)
+}
+
+func (dao ProductDao) CreateIfNotExists(name string, cathegory *ProductCathegory) *Product {
+	product := dao.FindByName(name)
+	if product.ID == 0 {
+		product = &Product{Name: name, Cathegory: *cathegory}
+		dao.Create(product)
+		fmt.Println("New product Id:", product.ID)
+	} else {
+		fmt.Println("Product exists Id:", product.ID)
+	}
+	return product
 }
 
 func (dao ProductDao) Save(product *Product) {

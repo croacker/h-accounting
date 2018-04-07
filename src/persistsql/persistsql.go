@@ -2,11 +2,41 @@ package persistsql
 
 import (
 	"fmt"
+	"strings"
 
+	"../ofd"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	_ "github.com/mattn/go-sqlite3"
 )
+
+// Save - Сохранить чеки в хранилище
+func Save(checks *ofd.OfdChecks) error {
+	var err error
+	db := GetDb()
+	migrate(db)
+	defer db.Close()
+
+	productDao := ProductDao{db}
+	productCathegoryDao := ProductCathegoryDao{db}
+	shopDao := ShopDao{db}
+
+	commonCathegory := productCathegoryDao.CreateIfNotExists("Общие")
+
+	for _, check := range *checks {
+
+		shopName := strings.Trim(check.User, " ")
+		inn := strings.Trim(check.UserInn, " ")
+		_ = shopDao.CreateIfNotExists(shopName, inn)
+
+		for _, item := range check.Items {
+			productName := strings.Trim(item.Name, " ")
+			_ = productDao.CreateIfNotExists(productName, commonCathegory)
+		}
+	}
+
+	return err
+}
 
 func Connect() {
 	db := GetDb()

@@ -1,6 +1,8 @@
 package persistsql
 
 import (
+	"fmt"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -14,11 +16,23 @@ type Shop struct {
 }
 
 type ShopDao struct {
-	db gorm.DB
+	db *gorm.DB
 }
 
 func (dao ShopDao) Create(shop *Shop) {
 	dao.db.Create(shop)
+}
+
+func (dao ShopDao) CreateIfNotExists(name string, inn string) *Shop {
+	shop := dao.FindByInn(inn)
+	if shop.ID == 0 {
+		shop = &Shop{Name: name, Inn: inn}
+		dao.Create(shop)
+		fmt.Println("New shop Id:", shop.ID)
+	} else {
+		fmt.Println("Shop exists Id:", shop.ID)
+	}
+	return shop
 }
 
 func (dao ShopDao) Save(shop *Shop) {
