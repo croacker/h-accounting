@@ -30,7 +30,7 @@ func printer(c chan string) {
 }
 
 func main() {
-	// persistsql.Connect()
+	persistsql.Init()
 	appConf := conf.Get()
 	fmt.Println("IncomingCheckFolder", appConf.IncomingCheckFolder)
 

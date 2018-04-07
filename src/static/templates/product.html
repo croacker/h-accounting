@@ -14,11 +14,13 @@
     <table>
         <tr>
             <th>Id</th>
+            <th>Категория</th>
             <th>Наименование</th>
         </tr>
-        {{range .goods}}
+        {{range .products}}
         <tr>
             <td>{{.Id}}</td>
+            <td>{{.Cathegory}}</td>
             <td>{{.Name}}</td>
         </tr>
         {{end}}

@@ -20,16 +20,11 @@ func (dao ProductCathegoryDao) Create(cathegory *ProductCathegory) {
 	dao.db.Create(cathegory)
 }
 
-func (dao ProductCathegoryDao) CreateIfNotExists(name string) *ProductCathegory {
-	productCathegory := dao.FindByName(name)
-	if productCathegory.ID == 0 {
-		productCathegory = &ProductCathegory{Name: name}
-		dao.Create(productCathegory)
-		fmt.Println("New product cathegory Id:", productCathegory.ID)
-	} else {
-		fmt.Println("Product cathegory exists Id:", productCathegory.ID)
-	}
-	return productCathegory
+func (dao ProductCathegoryDao) FirstOrCreate(name string) *ProductCathegory {
+	cathegory := &ProductCathegory{Name: name}
+	dao.db.FirstOrCreate(cathegory, ProductCathegory{Name: name})
+	fmt.Println("Product cathegory Id:", cathegory.ID)
+	return cathegory
 }
 
 func (dao ProductCathegoryDao) Save(cathegory *ProductCathegory) {

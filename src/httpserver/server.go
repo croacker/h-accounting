@@ -17,7 +17,7 @@ func StartGin() {
 	router.GET("/conf", confList)
 	router.GET("/ofdcheck", ofdCheckList)
 	router.GET("/checktotal", checkTotalList)
-	router.GET("/goods", goodsList)
+	router.GET("/product", productsList)
 	router.GET("/shop", shopList)
 	router.GET("/price", priceList)
 

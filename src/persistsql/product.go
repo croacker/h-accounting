@@ -8,9 +8,9 @@ import (
 
 type Product struct {
 	gorm.Model
-	Name               string
-	Cathegory          ProductCathegory `gorm:"foreignkey:ProductCathegoryId"`
-	ProductCathegoryId uint
+	Name        string
+	Cathegory   ProductCathegory `gorm:"foreignkey:CathegoryId"`
+	CathegoryId uint
 }
 
 type ProductDao struct {
@@ -21,15 +21,10 @@ func (dao ProductDao) Create(product *Product) {
 	dao.db.Create(product)
 }
 
-func (dao ProductDao) CreateIfNotExists(name string, cathegory *ProductCathegory) *Product {
-	product := dao.FindByName(name)
-	if product.ID == 0 {
-		product = &Product{Name: name, Cathegory: *cathegory}
-		dao.Create(product)
-		fmt.Println("New product Id:", product.ID)
-	} else {
-		fmt.Println("Product exists Id:", product.ID)
-	}
+func (dao ProductDao) FirstOrCreate(name string, cathegory *ProductCathegory) *Product {
+	var product = &Product{Name: name, Cathegory: *cathegory}
+	dao.db.FirstOrCreate(product, Product{Name: name})
+	fmt.Println("Product Id:", product.ID)
 	return product
 }
 
@@ -47,4 +42,10 @@ func (dao ProductDao) FindByName(name string) *Product {
 	var product Product
 	dao.db.First(&product, "name = ?", name)
 	return &product
+}
+
+func (dao ProductDao) GetAll() []Product {
+	var products []Product
+	dao.db.Preload("Cathegory").Find(&products)
+	return products
 }

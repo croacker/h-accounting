@@ -3,9 +3,15 @@ package httpserver
 import (
 	"net/http"
 
-	"../persistmongo"
+	"../persistsql"
 	"github.com/gin-gonic/gin"
 )
+
+type ShopDto struct {
+	Id   uint
+	Name string
+	Inn  string
+}
 
 func shopList(context *gin.Context) {
 	context.HTML(
@@ -17,6 +23,15 @@ func shopList(context *gin.Context) {
 	)
 }
 
-func getShops() []persistmongo.Shop {
-	return persistmongo.ShopList()
+func getShops() []ShopDto {
+	result := make([]ShopDto, 0)
+	for _, shop := range persistsql.ShopsList() {
+		dto := ShopDto{
+			Id:   shop.ID,
+			Name: shop.Name,
+			Inn:  shop.Inn,
+		}
+		result = append(result, dto)
+	}
+	return result
 }

@@ -1,7 +1,6 @@
 package persistsql
 
 import (
-	"fmt"
 	"strings"
 
 	"../ofd"
@@ -14,55 +13,54 @@ import (
 func Save(checks *ofd.OfdChecks) error {
 	var err error
 	db := GetDb()
-	migrate(db)
 	defer db.Close()
 
+	shopDao := ShopDao{db}
 	productDao := ProductDao{db}
 	productCathegoryDao := ProductCathegoryDao{db}
-	shopDao := ShopDao{db}
+	priceDao := PriceDao{db}
 
-	commonCathegory := productCathegoryDao.CreateIfNotExists("Общие")
+	commonCathegory := productCathegoryDao.FirstOrCreate("Общие")
 
 	for _, check := range *checks {
 
 		shopName := strings.Trim(check.User, " ")
 		inn := strings.Trim(check.UserInn, " ")
-		_ = shopDao.CreateIfNotExists(shopName, inn)
+		shop := shopDao.FirstOrCreate(shopName, inn)
 
 		for _, item := range check.Items {
 			productName := strings.Trim(item.Name, " ")
-			_ = productDao.CreateIfNotExists(productName, commonCathegory)
+			product := productDao.FirstOrCreate(productName, commonCathegory)
+
+			price := &Price{
+				Shop:     *shop,
+				Product:  *product,
+				Price:    item.Price,
+				DateTime: check.DateTime,
+			}
+			priceDao.FirstOrCreate(price)
 		}
 	}
 
 	return err
 }
 
-func Connect() {
+func Init() {
 	db := GetDb()
 	migrate(db)
 	defer db.Close()
+}
 
-	// Migrate the schema
+func ProductsList() []Product {
+	db := GetDb()
+	dao := ProductDao{db}
+	return dao.GetAll()
+}
 
-	cathegory := ProductCathegory{Name: "Фрукты"}
-	db.Create(&cathegory)
-
-	// Create
-	db.Create(&Product{Name: "Яблоки", Cathegory: cathegory})
-	db.Create(&Product{Name: "Бананы", Cathegory: cathegory})
-
-	// Read
-	var product Product
-	db.First(&product, 1) // find product with id 1
-	fmt.Println(product)
-	var product2 Product
-	db.First(&product2, "name = ?", "Бананы") // find product with code l1212
-	fmt.Println(product2)
-
-	// Update - update product's price to 2000
-	db.Model(&product).Update("Price", 2000)
-
+func ShopsList() []Shop {
+	db := GetDb()
+	dao := ShopDao{db}
+	return dao.GetAll()
 }
 
 func GetDb() *gorm.DB {

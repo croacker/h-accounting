@@ -1,6 +1,8 @@
 package persistsql
 
 import (
+	"fmt"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -16,11 +18,17 @@ type Price struct {
 }
 
 type PriceDao struct {
-	db gorm.DB
+	db *gorm.DB
 }
 
 func (dao PriceDao) Create(price *Price) {
 	dao.db.Create(price)
+}
+
+func (dao PriceDao) FirstOrCreate(price *Price) *Price {
+	dao.db.FirstOrCreate(price, Price{ShopId: price.Shop.ID, ProductId: price.Product.ID, DateTime: price.DateTime})
+	fmt.Println("Price Id:", price.ID)
+	return price
 }
 
 func (dao PriceDao) Save(price *Price) {
