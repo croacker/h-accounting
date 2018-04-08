@@ -19,10 +19,13 @@ func Save(checks *ofd.OfdChecks) error {
 	productDao := ProductDao{db}
 	productCathegoryDao := ProductCathegoryDao{db}
 	priceDao := PriceDao{db}
+	checkHeaderDao := CheckHeaderDao{db}
 
 	commonCathegory := productCathegoryDao.FirstOrCreate("Общие")
 
 	for _, check := range *checks {
+		checkHeader := NewCheckHeader(&check)
+		checkHeader = checkHeaderDao.FirstOrCreate(checkHeader)
 
 		shopName := strings.Trim(check.User, " ")
 		inn := strings.Trim(check.UserInn, " ")

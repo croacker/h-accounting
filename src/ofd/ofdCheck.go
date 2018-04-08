@@ -49,3 +49,19 @@ type OfdCheck struct {
 
 //OfdChecks ОФД чеки, оригинал из файла
 type OfdChecks []OfdCheck
+
+func ToInt(i interface{}) int {
+	v, ok := i.(int)
+	if !ok {
+		v = 0
+	}
+	return v
+}
+
+func ToString(i interface{}) string {
+	v, ok := i.(string)
+	if !ok {
+		v = ""
+	}
+	return v
+}
