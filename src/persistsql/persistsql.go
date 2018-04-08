@@ -76,4 +76,6 @@ func migrate(db *gorm.DB) {
 	db.AutoMigrate(&Product{})
 	db.AutoMigrate(&Shop{})
 	db.AutoMigrate(&Price{})
+	db.AutoMigrate(&CheckHeader{})
+	db.AutoMigrate(&CheckItem{})
 }
