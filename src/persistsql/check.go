@@ -2,6 +2,7 @@ package persistsql
 
 import (
 	"fmt"
+	"strings"
 
 	"../ofd"
 	"github.com/jinzhu/gorm"
@@ -32,20 +33,23 @@ type CheckHeader struct {
 	OperationType        int
 	Operator             string
 	RequestNumber        int
-	RetailPlaceAddress   string
-	ShiftNumber          int
-	StornoItems          string
-	TaxationType         int
-	TotalSum             int
-	User                 string
-	UserInn              string
-	Items                []CheckItem
+	// RetailPlaceAddress   string
+	ShiftNumber  int
+	StornoItems  string
+	TaxationType int
+	TotalSum     int
+	Shop         Shop `gorm:"foreignkey:ShopId"`
+	ShopId       uint
+	// User                 string
+	// UserInn              string
+	Items []CheckItem
 }
 
 type CheckItem struct {
 	gorm.Model
 	Modifiers       string
-	Name            string
+	Product         Product `gorm:"foreignkey:ProductId"`
+	ProductId       uint
 	Nds0            int
 	Nds10           int
 	Nds18           int
@@ -59,7 +63,7 @@ type CheckItem struct {
 	CheckHeaderID   uint
 }
 
-func NewCheckHeader(ofdCheck *ofd.OfdCheck) *CheckHeader {
+func (dao CheckHeaderDao) NewCheckHeader(shop Shop, ofdCheck *ofd.OfdCheck) *CheckHeader {
 	return &CheckHeader{
 		CashTotalSum:         ofdCheck.CashTotalSum,
 		DateTime:             ofdCheck.DateTime,
@@ -67,10 +71,10 @@ func NewCheckHeader(ofdCheck *ofd.OfdCheck) *CheckHeader {
 		DiscountSum:          ofd.ToInt(ofdCheck.DiscountSum),
 		EcashTotalSum:        ofdCheck.EcashTotalSum,
 		FiscalDocumentNumber: ofdCheck.FiscalDocumentNumber,
-		FiscalDriveNumber:    ofdCheck.FiscalDriveNumber,
+		FiscalDriveNumber:    strings.Trim(ofdCheck.FiscalDriveNumber, " "),
 		FiscalSign:           ofdCheck.FiscalSign,
 		KktNumber:            ofd.ToString(ofdCheck.KktNumber),
-		KktRegID:             ofdCheck.KktRegID,
+		KktRegID:             strings.Trim(ofdCheck.KktRegID, " "),
 		Markup:               ofd.ToString(ofdCheck.Markup),
 		MarkupSum:            ofd.ToInt(ofdCheck.MarkupSum),
 		Modifiers:            ofd.ToInt(ofdCheck.Modifiers),
@@ -81,25 +85,28 @@ func NewCheckHeader(ofdCheck *ofd.OfdCheck) *CheckHeader {
 		NdsCalculated18:      ofd.ToInt(ofdCheck.NdsCalculated18),
 		NdsNo:                ofd.ToInt(ofdCheck.NdsNo),
 		OperationType:        ofdCheck.OperationType,
-		Operator:             ofdCheck.Operator,
+		Operator:             strings.Trim(ofdCheck.Operator, " "),
 		RequestNumber:        ofdCheck.RequestNumber,
-		RetailPlaceAddress:   ofd.ToString(ofdCheck.RetailPlaceAddress),
-		ShiftNumber:          ofdCheck.ShiftNumber,
-		StornoItems:          ofd.ToString(ofdCheck.StornoItems),
-		TaxationType:         ofdCheck.TaxationType,
-		TotalSum:             ofdCheck.TotalSum,
-		User:                 ofdCheck.User,
-		UserInn:              ofdCheck.UserInn,
-		Items:                NewCheckItems(ofdCheck),
+		// RetailPlaceAddress:   ofd.ToString(ofdCheck.RetailPlaceAddress),
+		ShiftNumber:  ofdCheck.ShiftNumber,
+		StornoItems:  ofd.ToString(ofdCheck.StornoItems),
+		TaxationType: ofdCheck.TaxationType,
+		TotalSum:     ofdCheck.TotalSum,
+		// User:                 strings.Trim(ofdCheck.User, " "),
+		// UserInn:              strings.Trim(ofdCheck.UserInn, " "),
+		Shop:  shop,
+		Items: dao.NewCheckItems(ofdCheck),
 	}
 }
 
-func NewCheckItems(ofdCheck *ofd.OfdCheck) []CheckItem {
+func (dao CheckHeaderDao) NewCheckItems(ofdCheck *ofd.OfdCheck) []CheckItem {
+	productDao := ProductDao{dao.db}
 	items := make([]CheckItem, 0)
 	for _, ofdItem := range ofdCheck.Items {
+		product := productDao.FindByName(ofdItem.Name)
 		item := CheckItem{
 			Modifiers:       ofd.ToString(ofdItem.Modifiers),
-			Name:            ofdItem.Name,
+			Product:         *product,
 			Nds0:            ofd.ToInt(ofdItem.Nds0),
 			Nds10:           ofd.ToInt(ofdItem.Nds10),
 			Nds18:           ofdItem.Nds18,
@@ -125,8 +132,13 @@ func (dao CheckHeaderDao) Create(checkHeader *CheckHeader) {
 }
 
 func (dao CheckHeaderDao) FirstOrCreate(сheckHeader *CheckHeader) *CheckHeader {
-	dao.db.FirstOrCreate(&сheckHeader, сheckHeader)
-	fmt.Println("Price Id:", сheckHeader.ID)
+	dao.db.FirstOrCreate(сheckHeader,
+		CheckHeader{DateTime: сheckHeader.DateTime,
+			FiscalDriveNumber: сheckHeader.FiscalDriveNumber,
+			FiscalSign:        сheckHeader.FiscalSign,
+			KktRegID:          сheckHeader.KktRegID,
+		})
+	fmt.Println("Check Id:", сheckHeader.ID)
 	return сheckHeader
 }
 

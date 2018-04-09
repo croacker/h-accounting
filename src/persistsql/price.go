@@ -11,8 +11,8 @@ type Price struct {
 	gorm.Model
 	Product   Product `gorm:"foreignkey:ProductId"`
 	ProductId uint
-	Shop      Shop `gorm:"foreignkey:ShopId"`
-	ShopId    uint
+	Sailer    Sailer `gorm:"foreignkey:SailerId"`
+	SailerId  uint
 	Price     int
 	DateTime  int
 }
@@ -26,7 +26,7 @@ func (dao PriceDao) Create(price *Price) {
 }
 
 func (dao PriceDao) FirstOrCreate(price *Price) *Price {
-	dao.db.FirstOrCreate(price, Price{ShopId: price.Shop.ID, ProductId: price.Product.ID, DateTime: price.DateTime})
+	dao.db.FirstOrCreate(price, Price{SailerId: price.Sailer.ID, ProductId: price.Product.ID, DateTime: price.DateTime})
 	fmt.Println("Price Id:", price.ID)
 	return price
 }
@@ -43,7 +43,7 @@ func (dao PriceDao) FindById(id uint) *Price {
 
 func (dao PriceDao) Find(price *Price) *Price {
 	var dbPrice Price
-	dao.db.Where("product_id = ? AND shop_id = ? AND date_time = ?", price.ProductId, price.ShopId, price.DateTime).First(&dbPrice)
+	dao.db.Where("product_id = ? AND sailer_id = ? AND date_time = ?", price.ProductId, price.SailerId, price.DateTime).First(&dbPrice)
 	// dao.db.Where(Price{ProductId: price.ProductId, ShopId:price.ShopId, DateTime:price.DateTime}).First(&dbPrice)
 	return &dbPrice
 }

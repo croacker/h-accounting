@@ -1,5 +1,7 @@
 package ofd
 
+import "strings"
+
 //OfdCheck ОФД чек, оригинал из файла
 type OfdCheck struct {
 	CashTotalSum         int         `json:"cashTotalSum"`
@@ -38,7 +40,7 @@ type OfdCheck struct {
 	OperationType      int         `json:"operationType"`
 	Operator           string      `json:"operator"`
 	RequestNumber      int         `json:"requestNumber"`
-	RetailPlaceAddress interface{} `json:"retailPlaceAddress"`
+	RetailPlaceAddress string      `json:"retailPlaceAddress"`
 	ShiftNumber        int         `json:"shiftNumber"`
 	StornoItems        interface{} `json:"stornoItems"`
 	TaxationType       int         `json:"taxationType"`
@@ -63,5 +65,5 @@ func ToString(i interface{}) string {
 	if !ok {
 		v = ""
 	}
-	return v
+	return strings.Trim(v, " ")
 }

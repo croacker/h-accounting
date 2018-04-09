@@ -15,6 +15,7 @@ func Save(checks *ofd.OfdChecks) error {
 	db := GetDb()
 	defer db.Close()
 
+	sailerDao := SailerDao{db}
 	shopDao := ShopDao{db}
 	productDao := ProductDao{db}
 	productCathegoryDao := ProductCathegoryDao{db}
@@ -24,25 +25,27 @@ func Save(checks *ofd.OfdChecks) error {
 	commonCathegory := productCathegoryDao.FirstOrCreate("Общие")
 
 	for _, check := range *checks {
-		checkHeader := NewCheckHeader(&check)
-		checkHeader = checkHeaderDao.FirstOrCreate(checkHeader)
-
-		shopName := strings.Trim(check.User, " ")
+		sailerName := strings.Trim(check.User, " ")
 		inn := strings.Trim(check.UserInn, " ")
-		shop := shopDao.FirstOrCreate(shopName, inn)
+		sailer := sailerDao.FirstOrCreate(sailerName, inn)
+
+		shop := shopDao.FirstOrCreate(sailer, check.RetailPlaceAddress)
 
 		for _, item := range check.Items {
 			productName := strings.Trim(item.Name, " ")
 			product := productDao.FirstOrCreate(productName, commonCathegory)
 
 			price := &Price{
-				Shop:     *shop,
+				Sailer:   *sailer,
 				Product:  *product,
 				Price:    item.Price,
 				DateTime: check.DateTime,
 			}
 			priceDao.FirstOrCreate(price)
 		}
+
+		checkHeader := checkHeaderDao.NewCheckHeader(*shop, &check)
+		checkHeaderDao.FirstOrCreate(checkHeader)
 	}
 
 	return err
@@ -60,9 +63,9 @@ func ProductsList() []Product {
 	return dao.GetAll()
 }
 
-func ShopsList() []Shop {
+func ShopsList() []Sailer {
 	db := GetDb()
-	dao := ShopDao{db}
+	dao := SailerDao{db}
 	return dao.GetAll()
 }
 
@@ -77,6 +80,7 @@ func GetDb() *gorm.DB {
 func migrate(db *gorm.DB) {
 	db.AutoMigrate(&ProductCathegory{})
 	db.AutoMigrate(&Product{})
+	db.AutoMigrate(&Sailer{})
 	db.AutoMigrate(&Shop{})
 	db.AutoMigrate(&Price{})
 	db.AutoMigrate(&CheckHeader{})

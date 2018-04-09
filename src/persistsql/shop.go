@@ -6,13 +6,14 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-//Тип продавец(магазин)
+//Тип магазин
 type Shop struct {
 	gorm.Model
+	Sailer   Sailer `gorm:"foreignkey:SailerId"`
+	SailerId uint
 	//Наименование
-	Name string
-	//ИНН
-	Inn string
+	Name    string
+	Address string
 }
 
 type ShopDao struct {
@@ -23,10 +24,12 @@ func (dao ShopDao) Create(shop *Shop) {
 	dao.db.Create(shop)
 }
 
-func (dao ShopDao) FirstOrCreate(name string, inn string) *Shop {
-	shop := &Shop{Name: name, Inn: inn}
-	dao.db.FirstOrCreate(shop, Shop{Inn: inn})
-	fmt.Println("Shop Id:", shop.ID)
+func (dao ShopDao) FirstOrCreate(sailer *Sailer, address string) *Shop {
+	shop := &Shop{Sailer: *sailer,
+		Name:    toName(sailer, address),
+		Address: address}
+	dao.db.FirstOrCreate(shop, Shop{SailerId: sailer.ID, Address: address})
+	fmt.Println("Shop Id:", sailer.ID)
 	return shop
 }
 
@@ -47,7 +50,15 @@ func (dao ShopDao) FindByInn(inn string) *Shop {
 }
 
 func (dao ShopDao) GetAll() []Shop {
-	var shops []Shop
-	dao.db.Find(&shops)
-	return shops
+	var shop []Shop
+	dao.db.Find(&shop)
+	return shop
+}
+
+func toName(sailer *Sailer, address string) string {
+	result := sailer.Name
+	if len(address) != 0 {
+		result += "(" + address + ")"
+	}
+	return result
 }
