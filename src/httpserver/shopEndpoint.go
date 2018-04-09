@@ -8,12 +8,12 @@ import (
 )
 
 type ShopDto struct {
-	Id   uint
-	Name string
-	Inn  string
+	Id      uint
+	Name    string
+	Address string
 }
 
-func shopList(context *gin.Context) {
+func shopsView(context *gin.Context) {
 	context.HTML(
 		http.StatusOK,
 		"shop.html",
@@ -27,9 +27,9 @@ func getShops() []ShopDto {
 	result := make([]ShopDto, 0)
 	for _, shop := range persistsql.ShopsList() {
 		dto := ShopDto{
-			Id:   shop.ID,
-			Name: shop.Name,
-			Inn:  shop.Inn,
+			Id:      shop.ID,
+			Name:    shop.Name,
+			Address: shop.Address,
 		}
 		result = append(result, dto)
 	}

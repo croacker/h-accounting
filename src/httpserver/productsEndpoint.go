@@ -1,8 +1,6 @@
 package httpserver
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"../persistsql"
@@ -15,13 +13,16 @@ type ProductDto struct {
 	Cathegory string
 }
 
-func products(writer http.ResponseWriter, request *http.Request) {
+func products(context *gin.Context) {
 	products := getProducts()
-	str, _ := json.Marshal(products)
-	fmt.Fprintf(writer, string(str))
+	// str, _ := json.Marshal(products)
+	context.JSON(200, gin.H{
+		"products": products,
+	})
+	// fmt.Fprintf(writer, string(str))
 }
 
-func productsList(context *gin.Context) {
+func productsView(context *gin.Context) {
 	context.HTML(
 		http.StatusOK,
 		"product.html",

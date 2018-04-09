@@ -47,3 +47,9 @@ func (dao PriceDao) Find(price *Price) *Price {
 	// dao.db.Where(Price{ProductId: price.ProductId, ShopId:price.ShopId, DateTime:price.DateTime}).First(&dbPrice)
 	return &dbPrice
 }
+
+func (dao PriceDao) GetAll() []Price {
+	var prices []Price
+	dao.db.Preload("Product").Find(&prices)
+	return prices
+}

@@ -151,3 +151,9 @@ func (dao CheckHeaderDao) FindById(id uint) *CheckHeader {
 	dao.db.First(&сheckHeader, id)
 	return &сheckHeader
 }
+
+func (dao CheckHeaderDao) GetAll() []CheckHeader {
+	var checkHeaders []CheckHeader
+	dao.db.Preload("Shop").Find(&checkHeaders)
+	return checkHeaders
+}

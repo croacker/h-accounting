@@ -10,13 +10,17 @@
 <body>
     <table>
         <tr>
+            <th>Id</th>
             <th>Дата</th>
-            <th>Сумма нал.</th>
-            <th>Сумма безнал.</th>
+            <th>Магазин</th>
+            <th>Сумма нал</th>
+            <th>Сумма безнал</th>
         </tr>
-        {{range .ofdchecks}}
+        {{range .checks}}
         <tr>
+            <td>{{.Id}}</td>
             <td>{{.DateTime}}</td>
+            <td>{{.Shop}}</td>
             <td>{{.CashTotalSum}}</td>
             <td>{{.EcashTotalSum}}</td>
         </tr>

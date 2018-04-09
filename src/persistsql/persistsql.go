@@ -63,9 +63,27 @@ func ProductsList() []Product {
 	return dao.GetAll()
 }
 
-func ShopsList() []Sailer {
+func PricesList() []Price {
+	db := GetDb()
+	dao := PriceDao{db}
+	return dao.GetAll()
+}
+
+func SailersList() []Sailer {
 	db := GetDb()
 	dao := SailerDao{db}
+	return dao.GetAll()
+}
+
+func ShopsList() []Shop {
+	db := GetDb()
+	dao := ShopDao{db}
+	return dao.GetAll()
+}
+
+func ChecksList() []CheckHeader {
+	db := GetDb()
+	dao := CheckHeaderDao{db}
 	return dao.GetAll()
 }
 

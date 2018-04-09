@@ -13,15 +13,15 @@
 <body>
     <table>
         <tr>
-            <th>Id товара</th>
-            <th>Id проавца</th>
+            <th>Id</th>
+            <th>Товар</th>
             <th>Дата</th>
             <th>Цена</th>
         </tr>
         {{range .prices}}
         <tr>
-            <td>{{.GoodsId}}</td>
-            <td>{{.ShopId}}</td>
+            <td>{{.Id}}</td>
+            <td>{{.Product}}</td>
             <td>{{.DateTime}}</td>
             <td>{{.Price}}</td>
         </tr>

@@ -2,10 +2,9 @@ package httpserver
 
 import (
 	"net/http"
-	"strconv"
 
 	"../commonutils"
-	"../persistmongo"
+	"../persistsql"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,39 +19,31 @@ type CheckTotalDto struct {
 type TotalDto struct {
 	CashTotal  string
 	EcashTotal string
+	AllTotal   string
 }
 
-func checkTotalList(context *gin.Context) {
-	checkTotals, total := getCheckTotals()
+func checktotalView(context *gin.Context) {
+	total := getCheckTotals()
 	context.HTML(
 		http.StatusOK,
 		"checktotal.html",
 		gin.H{
-			"total":      total,
-			"checktotal": checkTotals,
+			"total": total,
 		},
 	)
 }
 
-func getCheckTotals() ([]CheckTotalDto, TotalDto) {
-	totals := make([]CheckTotalDto, 0)
+func getCheckTotals() TotalDto {
 	cashTotal := 0
 	ecashTotal := 0
-	for _, checkTotal := range persistmongo.CheckTotalsList() {
-		dto := CheckTotalDto{
-			Id:            checkTotal.Id.String(),
-			ShopId:        checkTotal.ShopId.String(),
-			DateTime:      commonutils.ParseTimestamp(int64(checkTotal.DateTime)).String(),
-			CashTotalSum:  strconv.Itoa(checkTotal.CashTotalSum / 100),
-			EcashTotalSum: strconv.Itoa(checkTotal.EcashTotalSum / 100),
-		}
-		totals = append(totals, dto)
+	for _, checkTotal := range persistsql.ChecksList() {
 		cashTotal += checkTotal.CashTotalSum
 		ecashTotal += checkTotal.EcashTotalSum
 	}
-	allTotal := TotalDto{
-		strconv.Itoa(cashTotal / 100),
-		strconv.Itoa(ecashTotal / 100),
+	totals := TotalDto{
+		commonutils.ToMoneyString(cashTotal),
+		commonutils.ToMoneyString(ecashTotal),
+		commonutils.ToMoneyString(cashTotal + ecashTotal),
 	}
-	return totals, allTotal
+	return totals
 }

@@ -2,21 +2,21 @@ package httpserver
 
 import (
 	"net/http"
-	"strconv"
 
 	"../commonutils"
-	"../persistmongo"
+	"../persistsql"
 	"github.com/gin-gonic/gin"
 )
 
 type PriceDto struct {
-	GoodsId  string
+	Id       uint
+	Product  string
 	ShopId   string
-	Price    string
 	DateTime string
+	Price    string
 }
 
-func priceList(context *gin.Context) {
+func pricesView(context *gin.Context) {
 	context.HTML(
 		http.StatusOK,
 		"price.html",
@@ -26,18 +26,18 @@ func priceList(context *gin.Context) {
 	)
 }
 
-func getPrices() []persistmongo.Price {
-	return persistmongo.PriceList()
+func getPrices() []persistsql.Price {
+	return persistsql.PricesList()
 }
 
 func getPricesDto() []PriceDto {
 	prices := make([]PriceDto, 0)
 	for _, price := range getPrices() {
 		dto := PriceDto{
-			GoodsId:  price.Id.String(),
-			ShopId:   price.ShopId.String(),
-			Price:    strconv.Itoa(price.Price / 100),
+			Id:       price.ID,
+			Product:  price.Product.Name,
 			DateTime: commonutils.ParseTimestamp(int64(price.DateTime)).String(),
+			Price:    commonutils.ToMoneyString(price.Price),
 		}
 		prices = append(prices, dto)
 	}
