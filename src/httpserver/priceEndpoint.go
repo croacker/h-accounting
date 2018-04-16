@@ -16,6 +16,14 @@ type PriceDto struct {
 	Price    string
 }
 
+func prices(context *gin.Context) {
+	context.Header("Access-Control-Allow-Origin", "*")
+	context.Header("Access-Control-Allow-Headers", "access-control-allow-origin, access-control-allow-headers")
+	context.JSON(200, gin.H{
+		"prices": getPricesDto(),
+	})
+}
+
 func pricesView(context *gin.Context) {
 	context.HTML(
 		http.StatusOK,

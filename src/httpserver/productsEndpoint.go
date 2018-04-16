@@ -14,12 +14,11 @@ type ProductDto struct {
 }
 
 func products(context *gin.Context) {
-	products := getProducts()
-	// str, _ := json.Marshal(products)
+	context.Header("Access-Control-Allow-Origin", "*")
+	context.Header("Access-Control-Allow-Headers", "access-control-allow-origin, access-control-allow-headers")
 	context.JSON(200, gin.H{
-		"products": products,
+		"products": getProducts(),
 	})
-	// fmt.Fprintf(writer, string(str))
 }
 
 func productsView(context *gin.Context) {

@@ -16,6 +16,14 @@ type CheckDto struct {
 	EcashTotalSum string
 }
 
+func checks(context *gin.Context) {
+	context.Header("Access-Control-Allow-Origin", "*")
+	context.Header("Access-Control-Allow-Headers", "access-control-allow-origin, access-control-allow-headers")
+	context.JSON(200, gin.H{
+		"checks": getChecksDto(),
+	})
+}
+
 func checksView(context *gin.Context) {
 	context.HTML(
 		http.StatusOK,
