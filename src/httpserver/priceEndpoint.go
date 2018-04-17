@@ -11,7 +11,7 @@ import (
 type PriceDto struct {
 	Id       uint
 	Product  string
-	ShopId   string
+	Sailer   string
 	DateTime string
 	Price    string
 }
@@ -43,6 +43,7 @@ func getPricesDto() []PriceDto {
 	for _, price := range getPrices() {
 		dto := PriceDto{
 			Id:       price.ID,
+			Sailer:   price.Sailer.Name,
 			Product:  price.Product.Name,
 			DateTime: commonutils.ParseTimestamp(int64(price.DateTime)).String(),
 			Price:    commonutils.ToMoneyString(price.Price),

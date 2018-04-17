@@ -50,6 +50,6 @@ func (dao PriceDao) Find(price *Price) *Price {
 
 func (dao PriceDao) GetAll() []Price {
 	var prices []Price
-	dao.db.Preload("Product").Find(&prices)
+	dao.db.Preload("Product").Preload("Sailer").Find(&prices)
 	return prices
 }
