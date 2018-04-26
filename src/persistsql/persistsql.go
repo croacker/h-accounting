@@ -1,8 +1,11 @@
 package persistsql
 
 import (
+	"path/filepath"
 	"strings"
 
+	"../commonutils"
+	"../conf"
 	"../ofd"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -88,11 +91,17 @@ func ChecksList() []CheckHeader {
 }
 
 func GetDb() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "./db/h-accounting.db")
+	dbPath := conf.Get().Sqlite.DbPath
+	commonutils.MkDirIfNotExists(filepath.Dir(dbPath))
+	db, err := gorm.Open("sqlite3", dbPath)
 	if err != nil {
 		panic("failed to connect database")
 	}
 	return db
+}
+
+func mkDir() {
+
 }
 
 func migrate(db *gorm.DB) {

@@ -31,3 +31,9 @@ func ToMoneyString(v int) string {
 func ToDatetimeString(timestamp int) string {
 	return ParseTimestamp(int64(timestamp)).Format("02-01-2006 15:04:05")
 }
+
+func MkDirIfNotExists(path string) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		os.MkdirAll(path, 0777)
+	}
+}

@@ -12,18 +12,29 @@ import (
 //Имя файла конфигурации
 const fileName = "conf.json"
 
-//Конфигурация приложения
+//Configuration Конфигурация приложения
 type Configuration struct {
 	IncomingCheckFolder string
-	DbServer               string
-	DbName              string
-	DbUser              string
-	DbPassword          string
+	Mongo               MongoConfig
+	Sqlite              SqliteConfig
+}
+
+//MongoConfig конфигурация mongodb
+type MongoConfig struct {
+	DbServer   string
+	DbName     string
+	DbUser     string
+	DbPassword string
+}
+
+//SqliteConfig конфигурация sqlite
+type SqliteConfig struct {
+	DbPath string
 }
 
 var configuration *Configuration
 
-//Получить конфигурацию
+//Get Получить конфигурацию
 func Get() *Configuration {
 	if configuration == nil {
 		config, err := load()
@@ -54,7 +65,13 @@ func makeDefault() *Configuration {
 	fullFileName := commonutils.CurrentFolder() + "/" + fileName
 	fmt.Println("Make default configuration", fullFileName)
 
-	configuration := Configuration{IncomingCheckFolder: "check"}
+	configuration := Configuration{
+		IncomingCheckFolder: "check", //"/home/alex/tmp/check"
+		Mongo:               MongoConfig{},
+		Sqlite: SqliteConfig{
+			DbPath: "./db/h-accounting.db",
+		},
+	}
 	b, err := json.Marshal(configuration)
 	if err != nil {
 		handleError(err)
