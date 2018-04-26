@@ -1,0 +1,14 @@
+{
+    "IncomingCheckFolder":"/home/alex/tmp/check",
+    "Mongo":
+        {
+            "dbServer": "ds157528.mlab.com:57528",
+            "dbName": "accounting",
+            "dbUser": "croacker",
+            "dbPassword": "7RV5699400"
+        },
+    "Sqlite":
+        {
+            "DbPath":"./db/h-accounting.db"
+        }
+}

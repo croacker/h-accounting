@@ -37,3 +37,12 @@ func MkDirIfNotExists(path string) {
 		os.MkdirAll(path, 0777)
 	}
 }
+
+func IsDir(path string) bool {
+	fi, err := os.Stat(path)
+	if err != nil {
+		fmt.Println(err)
+	}
+	mode := fi.Mode()
+	return mode.IsDir()
+}
