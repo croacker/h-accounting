@@ -3,30 +3,14 @@ package main
 import (
 	"fmt"
 	"log"
-	"path/filepath"
-	"time"
 
 	"./conf"
+	"./fileprocess"
 	"./filewatcher"
 	"./httpserver"
 	"./ofd"
 	"./persistsql"
 )
-
-func printer(c chan string) {
-	for {
-		fullPath := <-c
-		time.Sleep(1 * time.Second)
-		fileName := filepath.Base(fullPath)
-		fmt.Println("Incoming file", fileName)
-		ofdChecks, err := ofd.ReadChecks(fullPath)
-		if err == nil {
-			store(ofdChecks)
-		} else {
-			handleError(err)
-		}
-	}
-}
 
 func main() {
 	persistsql.Init()
@@ -34,8 +18,10 @@ func main() {
 	fmt.Println("IncomingCheckFolder", appConf.IncomingCheckFolder)
 
 	var c = make(chan string)
-	go printer(c)
+
+	go fileprocess.ProcessFile(c, store)
 	go httpserver.StartGin()
+
 	defer filewatcher.Watch(appConf.IncomingCheckFolder, c).Close()
 	doWait()
 }
@@ -50,7 +36,6 @@ func doWait() {
 func store(check *ofd.OfdChecks) {
 	fmt.Println("BEGIN save OFD checks")
 	persistsql.Save(check)
-	// persistmongo.Save(check)
 	fmt.Println("Save OFD checks SUCCESS")
 }
 
