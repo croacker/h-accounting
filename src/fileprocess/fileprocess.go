@@ -21,17 +21,17 @@ func ProcessFile(c chan string, persist Store) {
 	for {
 		fullPath := <-c
 		time.Sleep(1 * time.Second)
-		if !commonutils.IsDir(fullPath){
-		fileName := filepath.Base(fullPath)
-		fmt.Println("Incoming file", fileName)
-		ofdChecks, err := ofd.ReadChecks(fullPath)
-		if err == nil {
-			persist(ofdChecks)
-			toBackup(fullPath)
-		} else {
-			handleError(err)
+		if !commonutils.IsDir(fullPath) {
+			fileName := filepath.Base(fullPath)
+			fmt.Println("Incoming file", fileName)
+			ofdChecks, err := ofd.ReadChecks(fullPath)
+			if err == nil {
+				persist(ofdChecks)
+				toBackup(fullPath)
+			} else {
+				handleError(err)
+			}
 		}
-	}
 	}
 }
 
