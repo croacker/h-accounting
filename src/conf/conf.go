@@ -32,6 +32,13 @@ type SqliteConfig struct {
 	DbPath string
 }
 
+//IncomingMailBoxConfig конфигурация входящего почтового ящика
+type IncomingMailBoxConfig struct {
+	ImapServer string //imap.mail.ru
+	User       string
+	Password   string
+}
+
 var configuration *Configuration
 
 //Get Получить конфигурацию
