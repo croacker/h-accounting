@@ -13,16 +13,16 @@ import (
 )
 
 func main() {
-	persistsql.Init()
 	appConf := conf.Get()
+	persistsql.Init()
 	fmt.Println("IncomingCheckFolder", appConf.IncomingCheckFolder)
 
-	var c = make(chan string)
+	var fileNameChanel = make(chan string)
 
-	go fileprocess.ProcessFile(c, store)
 	go httpserver.StartGin()
+	go fileprocess.ProcessFile(fileNameChanel, store)
 
-	defer filewatcher.Watch(appConf.IncomingCheckFolder, c).Close()
+	defer filewatcher.Watch(appConf.IncomingCheckFolder, fileNameChanel).Close()
 	doWait()
 }
 

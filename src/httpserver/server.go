@@ -4,9 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// import "encoding/json"
-// import "github.com/gin-gonic/gin"
-
 //StartGin запуск http-сервера
 func StartGin() {
 	router := gin.Default()
