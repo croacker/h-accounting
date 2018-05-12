@@ -17,6 +17,7 @@ type Configuration struct {
 	IncomingCheckFolder string
 	Mongo               MongoConfig
 	Sqlite              SqliteConfig
+	MailBox       MailBox
 }
 
 //MongoConfig конфигурация mongodb
@@ -32,11 +33,11 @@ type SqliteConfig struct {
 	DbPath string
 }
 
-//IncomingMailBoxConfig конфигурация входящего почтового ящика
-type IncomingMailBoxConfig struct {
-	ImapServer string //imap.mail.ru
-	User       string
-	Password   string
+//MailBox конфигурация входящего почтового ящика
+type MailBox struct {
+	ServerAddress string //imap.mail.ru:993
+	User          string //croacker@mail.ru
+	Password      string
 }
 
 var configuration *Configuration
@@ -78,6 +79,7 @@ func makeDefault() *Configuration {
 		Sqlite: SqliteConfig{
 			DbPath: "./db/h-accounting.db",
 		},
+		MailBox: MailBox{},
 	}
 	b, err := json.Marshal(configuration)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"./conf"
+	"./emailprocess"
 	"./fileprocess"
 	"./filewatcher"
 	"./httpserver"
@@ -14,6 +15,8 @@ import (
 
 func main() {
 	appConf := conf.Get()
+	emailprocess.Receive2()
+
 	persistsql.Init()
 	fmt.Println("IncomingCheckFolder", appConf.IncomingCheckFolder)
 
