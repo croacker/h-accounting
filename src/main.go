@@ -15,8 +15,6 @@ import (
 
 func main() {
 	appConf := conf.Get()
-	emailprocess.Receive()
-	return
 
 	persistsql.Init()
 	fmt.Println("IncomingCheckFolder", appConf.IncomingCheckFolder)
@@ -25,7 +23,8 @@ func main() {
 
 	go httpserver.StartGin()
 	go fileprocess.ProcessFile(fileNameChanel, store)
-
+	go emailprocess.StartReceive()
+	
 	defer filewatcher.Watch(appConf.IncomingCheckFolder, fileNameChanel).Close()
 	doWait()
 }

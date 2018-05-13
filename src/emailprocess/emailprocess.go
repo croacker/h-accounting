@@ -1,6 +1,7 @@
 package emailprocess
 
 import (
+	"fmt"
 	// "io"
 	// "io/ioutil"
 
@@ -8,6 +9,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
+	"time"
 
 	"../conf"
 	"github.com/emersion/go-imap"
@@ -15,35 +18,20 @@ import (
 	"github.com/emersion/go-message/mail"
 )
 
-const checkMailSubject = "#CHECK"
+const checkMailSubject = "#check"
 
-func Receive() {
+func StartReceive() {
+	for xs := range time.Tick(1 * time.Minute) {
+		fmt.Println(xs)
+		receive()
+	}
+}
+
+func receive() {
 	log.Println("Connecting to server...")
 
 	mailClient := login()
 	defer mailClient.Logout()
-
-	// mbox := getInbox(mailClient)
-
-	// // Get the last message
-	// if mbox.Messages == 0 {
-	// 	log.Fatal("No message in mailbox")
-	// }
-	// to := mbox.Messages
-	// from := to - 9
-	// seqSet := new(imap.SeqSet)
-	// seqSet.AddRange(from, to)
-	// // seqSet.AddNum(mbox.Messages)
-
-	// // Get the whole message body
-	// section := &imap.BodySectionName{}
-	// items := []imap.FetchItem{section.FetchItem()}
-
-	// messages := make(chan *imap.Message, 10)
-	// go func() {
-	// 	err := mailClient.Fetch(seqSet, items, messages)
-	// 	errorFatal(err)
-	// }()
 
 	section := &imap.BodySectionName{}
 	for msg := range getMessages(10, mailClient) {
@@ -56,26 +44,18 @@ func Receive() {
 			log.Fatal("Server didn't returned message body")
 		}
 
-		// Create a new mail reader
 		mr, err := mail.CreateReader(r)
 		errorFatal(err)
 
-		// Print some info about the message
 		header := mr.Header
-		if date, err := header.Date(); err == nil {
-			log.Println("Date:", date)
+		subject, err := header.Subject()
+		if err != nil {
+			continue
 		}
-		// if from, err := header.AddressList("From"); err == nil {
-		// 	log.Println("From:", from)
-		// }
-		// if to, err := header.AddressList("To"); err == nil {
-		// 	log.Println("To:", to)
-		// }
-		if subject, err := header.Subject(); err == nil {
-			log.Println("Subject:", subject)
+		if !strings.EqualFold(subject, checkMailSubject) {
+			continue
 		}
 
-		// Process each message's part
 		for {
 			p, err := mr.NextPart()
 			if err == io.EOF {
@@ -92,8 +72,9 @@ func Receive() {
 			case mail.AttachmentHeader:
 				// This is an attachment
 				filename, _ := h.Filename()
+				filePath := conf.Get().IncomingCheckFolder + "/" + filename
 				b, _ := ioutil.ReadAll(p.Body)
-				fo, _ := os.Create(filename)
+				fo, _ := os.Create(filePath)
 				fo.Write(b)
 				log.Println("Got attachment: %v", filename)
 			}
