@@ -19,25 +19,12 @@ const checkMailSubject = "#CHECK"
 func Receive2() {
 	log.Println("Connecting to server...")
 
-	// Connect to server
-	c := connect()
-	// Don't forget to logout
+	c := login()
 	defer c.Logout()
-
-	// Login
-	user := conf.Get().MailBox.User
-	password := conf.Get().MailBox.Password
-
-	if err := c.Login(user, password); err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Logged in")
 
 	// Select INBOX
 	mbox, err := c.Select("INBOX", false)
-	if err != nil {
-		log.Fatal(err)
-	}
+	errorFatal(err)
 
 	// Get the last message
 	if mbox.Messages == 0 {
@@ -52,9 +39,8 @@ func Receive2() {
 
 	messages := make(chan *imap.Message, 1)
 	go func() {
-		if err := c.Fetch(seqSet, items, messages); err != nil {
-			log.Fatal(err)
-		}
+		err := c.Fetch(seqSet, items, messages)
+		errorFatal(err)
 	}()
 
 	msg := <-messages
@@ -69,9 +55,7 @@ func Receive2() {
 
 	// Create a new mail reader
 	mr, err := mail.CreateReader(r)
-	if err != nil {
-		log.Fatal(err)
-	}
+	errorFatal(err)
 
 	// Print some info about the message
 	header := mr.Header
@@ -93,8 +77,8 @@ func Receive2() {
 		p, err := mr.NextPart()
 		if err == io.EOF {
 			break
-		} else if err != nil {
-			log.Fatal(err)
+		} else {
+			errorFatal(err)
 		}
 
 		switch h := p.Header.(type) {
@@ -106,19 +90,36 @@ func Receive2() {
 			// This is an attachment
 			filename, _ := h.Filename()
 			b, _ := ioutil.ReadAll(p.Body)
-			fo, _ := os.Create("output.txt")
+			fo, _ := os.Create(filename)
 			fo.Write(b)
 			log.Println("Got attachment: %v", filename)
 		}
 	}
 }
 
+func login() *client.Client {
+	c := connect()
+
+	user := conf.Get().MailBox.User
+	password := conf.Get().MailBox.Password
+
+	err := c.Login(user, password)
+	errorFatal(err)
+	log.Println("Logged in")
+
+	return c
+}
+
 func connect() *client.Client {
 	mailBox := conf.Get().MailBox
 	result, err := client.DialTLS(mailBox.ServerAddress, nil)
+	errorFatal(err)
+	log.Println("Connected")
+	return result
+}
+
+func errorFatal(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Connected")
-	return result
 }
