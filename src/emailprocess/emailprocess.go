@@ -19,6 +19,7 @@ import (
 )
 
 const checkMailSubject = "#check"
+const checksMailSubject = "#checks"
 
 func StartReceive() {
 	for xs := range time.Tick(1 * time.Minute) {
@@ -52,7 +53,7 @@ func receive() {
 		if err != nil {
 			continue
 		}
-		if !strings.EqualFold(subject, checkMailSubject) {
+		if !isChecksSubject(subject) {
 			continue
 		}
 
@@ -76,7 +77,7 @@ func receive() {
 				b, _ := ioutil.ReadAll(p.Body)
 				fo, _ := os.Create(filePath)
 				fo.Write(b)
-				log.Println("Got attachment: %v", filename)
+				log.Println("Save attachment to: %v", filePath)
 			}
 		}
 	}
@@ -139,4 +140,8 @@ func errorFatal(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func isChecksSubject(subject string) bool {
+	return strings.EqualFold(subject, checkMailSubject) || strings.EqualFold(subject, checksMailSubject)
 }
