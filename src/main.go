@@ -15,7 +15,8 @@ import (
 
 func main() {
 	appConf := conf.Get()
-	emailprocess.Receive2()
+	emailprocess.Receive()
+	return
 
 	persistsql.Init()
 	fmt.Println("IncomingCheckFolder", appConf.IncomingCheckFolder)
