@@ -46,3 +46,8 @@ func IsDir(path string) bool {
 	mode := fi.Mode()
 	return mode.IsDir()
 }
+
+func IsExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}

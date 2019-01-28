@@ -10,6 +10,7 @@ import (
 	"./httpserver"
 	"./ofd"
 	"./persistsql"
+	"./commonutils"
 )
 
 func main() {
@@ -17,12 +18,13 @@ func main() {
 	appConf := conf.Get()
 	fmt.Println("IncomingCheckFolder", appConf.IncomingCheckFolder)
 
-	var c = make(chan string)
+	var incomingFileChanel = make(chan string)
 
-	go fileprocess.ProcessFile(c, store)
+	go fileprocess.ProcessFile(incomingFileChanel, store)
 	go httpserver.StartGin()
-
-	defer filewatcher.Watch(appConf.IncomingCheckFolder, c).Close()
+	if(commonutils.IsExists(appConf.IncomingCheckFolder)){
+		defer filewatcher.Watch(appConf.IncomingCheckFolder, incomingFileChanel).Close()
+	}
 	doWait()
 }
 
